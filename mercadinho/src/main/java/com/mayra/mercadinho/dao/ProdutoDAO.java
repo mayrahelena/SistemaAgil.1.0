@@ -16,11 +16,15 @@ public class ProdutoDAO {
         conectar();  // Ao instanciar a classe, chamamos o método para estabelecer a conexão com o banco
     }
 
+    public ProdutoDAO(Connection connection) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     // Método para conectar ao banco de dados
     private void conectar() {
         try {
             // Conexão com o banco de dados MySQL
-            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "021998@Amor");
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "Senac@2024");
 
             if (this.connection != null) {
                 System.out.println("Conexão estabelecida com o banco de dados.");
@@ -108,7 +112,7 @@ public void adicionar(Produto produto, int quantidade, int estoqueMinimo) throws
 
     // Método para adicionar um produto
     public int adicionarProduto(Produto produto) throws SQLException {
-        String sql = "INSERT INTO produtos (nome, preco, codigo_barras) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO produto (nome, preco, codigo_barras) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             // Preenche os parâmetros da consulta
@@ -217,5 +221,9 @@ public void adicionar(Produto produto, int quantidade, int estoqueMinimo) throws
                 System.err.println("Erro ao fechar a conexão: " + e.getMessage());
             }
         }
+    }
+
+    public Object getProdutoById(int produtoId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
