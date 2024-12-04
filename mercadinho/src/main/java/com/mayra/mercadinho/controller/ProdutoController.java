@@ -18,13 +18,24 @@ public class ProdutoController {
     }
 
  
-    public void adicionarProduto(Produto produto, int quantidade, int estoqueMinimo) throws SQLException {
-    // Adicionar o produto
-    int produtoId = produtoDAO.adicionarProduto(produto);
+public void adicionarProduto(Produto produto, int quantidade, int estoqueMinimo) throws SQLException {
+    // Verificar se o produto já existe no banco
+    Produto produtoExistente = produtoDAO.localizar(produto.getCodigoBarras());
 
-    // Agora insira os dados no estoque
-    estoqueDAO.adicionarEstoque(produtoId, quantidade, estoqueMinimo);
+    if (produtoExistente != null) {
+        // Se o produto já existe, usar o ID do produto existente para atualizar o estoque
+        System.out.println("Produto já existente: " + produtoExistente.getNome() + " - Código de Barras: " + produtoExistente.getCodigoBarras());
+        // Atualizar o estoque para o produto existente
+        estoqueDAO.atualizarEstoque(produtoExistente.getId(), quantidade, estoqueMinimo);
+        System.out.println("Estoque atualizado com sucesso!");
+    } else {
+        // Se o produto não existe, adicionar o novo produto e o estoque
+        System.out.println("Produto não encontrado. Adicionando novo produto...");
+        produtoDAO.adicionar(produto, quantidade, estoqueMinimo);
+        System.out.println("Produto e estoque adicionados com sucesso!");
+    }
 }
+    
     
    // Método para listar todos os produtos
     public List<Produto> listarProdutos() throws SQLException {

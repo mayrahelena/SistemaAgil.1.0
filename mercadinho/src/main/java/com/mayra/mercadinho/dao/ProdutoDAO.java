@@ -19,115 +19,92 @@ public class ProdutoDAO {
     // Método para conectar ao banco de dados
     private void conectar() {
         try {
-            // Conexão com o banco de dados MySQL
-            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "021998@Amor");
-
-            if (this.connection != null) {
-                System.out.println("Conexão estabelecida com o banco de dados.");
-            } else {
-                System.out.println("Falha ao estabelecer a conexão com o banco de dados.");
-            }
+            // Usando a classe DatabaseConnection para obter a conexão
+            this.connection = DatabaseConnection.getConnection();
+            System.out.println("Conexão estabelecida com o banco de dados.");
         } catch (SQLException e) {
             // Se a conexão falhar, captura a exceção e imprime a mensagem
             System.err.println("Erro ao conectar ao banco de dados: " + e.getMessage());
         }
     }
 
-public void adicionar(Produto produto, int quantidade, int estoqueMinimo) throws SQLException {
-    if (connection == null) {
-        throw new SQLException("Conexão não estabelecida com o banco.");
-    }
+    // Método para adicionar ou atualizar produto
+    public void adicionar(Produto produto, int quantidade, int estoqueMinimo) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Conexão não estabelecida com o banco.");
+        }
 
-    // Verificar se o produto já existe no banco de dados, seja por nome ou código de barras
-    String sqlVerificacao = "SELECT * FROM produto WHERE nome = ? OR codigo_barras = ?";
-    try (PreparedStatement stmtVerificacao = connection.prepareStatement(sqlVerificacao)) {
-        stmtVerificacao.setString(1, produto.getNome());  // Passa o nome do produto
-        stmtVerificacao.setString(2, produto.getCodigoBarras());  // Passa o código de barras
-        ResultSet rs = stmtVerificacao.executeQuery();  // Executa a consulta no banco de dados
+        // Verificar se o produto já existe no banco de dados, seja por nome ou código de barras
+        String sqlVerificacao = "SELECT * FROM produto WHERE nome = ? OR codigo_barras = ?";
+        try (PreparedStatement stmtVerificacao = connection.prepareStatement(sqlVerificacao)) {
+            stmtVerificacao.setString(1, produto.getNome());  // Passa o nome do produto
+            stmtVerificacao.setString(2, produto.getCodigoBarras());  // Passa o código de barras
+            ResultSet rs = stmtVerificacao.executeQuery();  // Executa a consulta no banco de dados
 
-        if (rs.next()) {
-            // Produto já existe no banco, verificamos a quantidade atual no estoque
-            int produtoId = rs.getInt("id");
-            int quantidadeAtual = rs.getInt("quantidade");
-            int estoqueMinimoAtual = rs.getInt("estoque_minimo");
+            if (rs.next()) {
+                // Produto já existe no banco, verificamos a quantidade atual no estoque
+                int produtoId = rs.getInt("id");
 
-            // Exibe informações do produto já existente
-            System.out.println("Produto já existente. Nome: " + produto.getNome() + " - Código de Barras: " + produto.getCodigoBarras());
-            System.out.println("Estoque Atual: " + quantidadeAtual + ", Estoque Mínimo Atual: " + estoqueMinimoAtual);
-            System.out.println("Deseja atualizar a quantidade e o estoque mínimo? (S/N)");
+                // Consultar o estoque atual
+                String sqlEstoqueVerificacao = "SELECT * FROM estoque WHERE produto_id = ?";
+                try (PreparedStatement stmtEstoque = connection.prepareStatement(sqlEstoqueVerificacao)) {
+                    stmtEstoque.setInt(1, produtoId);
+                    ResultSet rsEstoque = stmtEstoque.executeQuery();
+                    if (rsEstoque.next()) {
+                        int quantidadeAtual = rsEstoque.getInt("quantidade");
+                        int estoqueMinimoAtual = rsEstoque.getInt("estoque_minimo");
 
-            Scanner scanner = new Scanner(System.in);  // Leitura da entrada do usuário
-            String resposta = scanner.nextLine().toUpperCase();
+                        // Exibe informações do produto já existente
+                        System.out.println("Produto já existente. Nome: " + produto.getNome() + " - Código de Barras: " + produto.getCodigoBarras());
+                        System.out.println("Estoque Atual: " + quantidadeAtual + ", Estoque Mínimo Atual: " + estoqueMinimoAtual);
+                        System.out.println("Deseja atualizar a quantidade e o estoque mínimo? (S/N)");
 
-            if (resposta.equals("S")) {
-                // Atualiza a quantidade e o estoque mínimo no banco de dados
-                String sqlAtualizacaoEstoque = "UPDATE estoque SET quantidade = ?, estoque_minimo = ? WHERE produto_id = ?";
-                try (PreparedStatement stmtAtualizacaoEstoque = connection.prepareStatement(sqlAtualizacaoEstoque)) {
-                    int novaQuantidade = quantidadeAtual + quantidade;  // Soma a quantidade atual com a nova
-                    stmtAtualizacaoEstoque.setInt(1, novaQuantidade);  // Atualiza a quantidade
-                    stmtAtualizacaoEstoque.setInt(2, estoqueMinimo);  // Atualiza o estoque mínimo
-                    stmtAtualizacaoEstoque.setInt(3, produtoId);  // Relaciona com o ID do produto
-                    stmtAtualizacaoEstoque.executeUpdate();
-                    System.out.println("Estoque e estoque mínimo atualizados com sucesso!");
+                        Scanner scanner = new Scanner(System.in);  // Leitura da entrada do usuário
+                        String resposta = scanner.nextLine().toUpperCase();
+
+                        if (resposta.equals("S")) {
+                            // Atualiza a quantidade e o estoque mínimo no banco de dados
+                            String sqlAtualizacaoEstoque = "UPDATE estoque SET quantidade = ?, estoque_minimo = ? WHERE produto_id = ?";
+                            try (PreparedStatement stmtAtualizacaoEstoque = connection.prepareStatement(sqlAtualizacaoEstoque)) {
+                                int novaQuantidade = quantidadeAtual + quantidade;  // Soma a quantidade atual com a nova
+                                stmtAtualizacaoEstoque.setInt(1, novaQuantidade);  // Atualiza a quantidade
+                                stmtAtualizacaoEstoque.setInt(2, estoqueMinimo);  // Atualiza o estoque mínimo
+                                stmtAtualizacaoEstoque.setInt(3, produtoId);  // Relaciona com o ID do produto
+                                stmtAtualizacaoEstoque.executeUpdate();
+                                System.out.println("Estoque e estoque mínimo atualizados com sucesso!");
+                            }
+                        }
+                    }
                 }
             } else {
-                // Se não quiser atualizar, pede para o usuário informar um novo código de barras
-                System.out.println("Por favor, digite um novo código de barras para o produto:");
-                String novoCodigoBarras = scanner.nextLine();
-                produto.setCodigoBarras(novoCodigoBarras);  // Atualiza o código de barras do produto
-                // Chama recursivamente o método de adicionar com o novo código de barras
-                adicionar(produto, quantidade, estoqueMinimo);
-            }
-        } else {
-            // Caso o produto não exista, insere um novo produto no banco
-            String sqlProduto = "INSERT INTO produto (nome, preco, codigo_barras) VALUES (?, ?, ?)";
-            try (PreparedStatement stmtProduto = connection.prepareStatement(sqlProduto, Statement.RETURN_GENERATED_KEYS)) {
-                stmtProduto.setString(1, produto.getNome());
-                stmtProduto.setDouble(2, produto.getPreco());
-                stmtProduto.setString(3, produto.getCodigoBarras());
-                stmtProduto.executeUpdate();
+                // Caso o produto não exista, insere um novo produto no banco
+                String sqlProduto = "INSERT INTO produto (nome, preco, codigo_barras) VALUES (?, ?, ?)";
+                try (PreparedStatement stmtProduto = connection.prepareStatement(sqlProduto, Statement.RETURN_GENERATED_KEYS)) {
+                    stmtProduto.setString(1, produto.getNome());
+                    stmtProduto.setDouble(2, produto.getPreco());
+                    stmtProduto.setString(3, produto.getCodigoBarras());
+                    stmtProduto.executeUpdate();
 
-                // Recupera o ID do produto recém-inserido
-                ResultSet rsProduto = stmtProduto.getGeneratedKeys();
-                if (rsProduto.next()) {
-                    int produtoId = rsProduto.getInt(1);  // ID do produto recém-inserido
+                    // Recupera o ID do produto recém-inserido
+                    ResultSet rsProduto = stmtProduto.getGeneratedKeys();
+                    if (rsProduto.next()) {
+                        int produtoId = rsProduto.getInt(1);  // ID do produto recém-inserido
 
-                    // Agora insere o estoque do produto na tabela 'estoque'
-                    String sqlEstoque = "INSERT INTO estoque (produto_id, quantidade, estoque_minimo) VALUES (?, ?, ?)";
-                    try (PreparedStatement stmtEstoque = connection.prepareStatement(sqlEstoque)) {
-                        stmtEstoque.setInt(1, produtoId);  // Relaciona com o ID do produto
-                        stmtEstoque.setInt(2, quantidade);  // Define a quantidade inicial
-                        stmtEstoque.setInt(3, estoqueMinimo);  // Define o estoque mínimo
-                        stmtEstoque.executeUpdate();
+                        // Agora insere o estoque do produto na tabela 'estoque'
+                        String sqlEstoque = "INSERT INTO estoque (produto_id, quantidade, estoque_minimo) VALUES (?, ?, ?)";
+                        try (PreparedStatement stmtEstoque = connection.prepareStatement(sqlEstoque)) {
+                            stmtEstoque.setInt(1, produtoId);  // Relaciona com o ID do produto
+                            stmtEstoque.setInt(2, quantidade);  // Define a quantidade inicial
+                            stmtEstoque.setInt(3, estoqueMinimo);  // Define o estoque mínimo
+                            stmtEstoque.executeUpdate();
+                        }
                     }
                 }
             }
         }
     }
-}
 
-    // Método para adicionar um produto
-    public int adicionarProduto(Produto produto) throws SQLException {
-        String sql = "INSERT INTO produtos (nome, preco, codigo_barras) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            // Preenche os parâmetros da consulta
-            stmt.setString(1, produto.getNome());
-            stmt.setDouble(2, produto.getPreco());
-            stmt.setString(3, produto.getCodigoBarras());
 
-            // Executa a inserção
-            stmt.executeUpdate();
-
-            // Obtém o ID gerado
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1);  // Retorna o ID gerado
-                }
-            }
-        }
-        return -1;  // Caso não tenha conseguido recuperar o ID
-    }
     
     // Método para listar todos os produtos
     public List<Produto> listar() throws SQLException {
@@ -217,5 +194,9 @@ public void adicionar(Produto produto, int quantidade, int estoqueMinimo) throws
                 System.err.println("Erro ao fechar a conexão: " + e.getMessage());
             }
         }
+    }
+
+    public int adicionarProduto(Produto produto) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
