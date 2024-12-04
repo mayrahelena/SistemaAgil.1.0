@@ -16,12 +16,27 @@ public class ProdutoDAO {
         conectar();  // Ao instanciar a classe, chamamos o método para estabelecer a conexão com o banco
     }
 
+    public ProdutoDAO(Connection connection) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     // Método para conectar ao banco de dados
     private void conectar() {
         try {
+<<<<<<< HEAD
             // Usando a classe DatabaseConnection para obter a conexão
             this.connection = DatabaseConnection.getConnection();
             System.out.println("Conexão estabelecida com o banco de dados.");
+=======
+            // Conexão com o banco de dados MySQL
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "Senac@2024");
+
+            if (this.connection != null) {
+                System.out.println("Conexão estabelecida com o banco de dados.");
+            } else {
+                System.out.println("Falha ao estabelecer a conexão com o banco de dados.");
+            }
+>>>>>>> 011b332cd5a56e520114c7c83762db3451ffbeed
         } catch (SQLException e) {
             // Se a conexão falhar, captura a exceção e imprime a mensagem
             System.err.println("Erro ao conectar ao banco de dados: " + e.getMessage());
@@ -104,6 +119,18 @@ public class ProdutoDAO {
         }
     }
 
+<<<<<<< HEAD
+=======
+    // Método para adicionar um produto
+    public int adicionarProduto(Produto produto) throws SQLException {
+        String sql = "INSERT INTO produto (nome, preco, codigo_barras) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            // Preenche os parâmetros da consulta
+            stmt.setString(1, produto.getNome());
+            stmt.setDouble(2, produto.getPreco());
+            stmt.setString(3, produto.getCodigoBarras());
+>>>>>>> 011b332cd5a56e520114c7c83762db3451ffbeed
 
     
     // Método para listar todos os produtos
@@ -196,7 +223,11 @@ public class ProdutoDAO {
         }
     }
 
+<<<<<<< HEAD
     public int adicionarProduto(Produto produto) {
+=======
+    public Object getProdutoById(int produtoId) {
+>>>>>>> 011b332cd5a56e520114c7c83762db3451ffbeed
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

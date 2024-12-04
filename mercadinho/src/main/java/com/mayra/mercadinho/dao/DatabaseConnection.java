@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/mercadinho_db"; // URL do banco de dados
     private static final String USER = "root"; // Usuário do MySQL
-    private static final String PASSWORD = "021998@Amor"; // Senha do MySQL
+    private static final String PASSWORD = "Senac@2024"; // Senha do MySQL
 
     // Método para abrir a conexão com o banco de dados
     public static Connection getConnection() throws SQLException {
