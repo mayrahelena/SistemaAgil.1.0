@@ -8,9 +8,11 @@ com\mayra\mercadinho\model\ItemVenda.class
 com\mayra\mercadinho\model\Estoque.class
 com\mayra\mercadinho\model\Produto.class
 com\mayra\mercadinho\service\ProdutoService.class
+com\mayra\mercadinho\service\VendaService.class
 com\mayra\mercadinho\dao\CaixaDAO.class
 com\mayra\mercadinho\dao\DatabaseConnection.class
 com\mayra\mercadinho\dao\ProdutoDAO.class
+com\mayra\mercadinho\model\Pagamento.class
 com\mayra\mercadinho\model\Venda.class
 com\mercadinho\Mercadinho.class
 com\mayra\mercadinho\dao\TestDatabaseConnection.class

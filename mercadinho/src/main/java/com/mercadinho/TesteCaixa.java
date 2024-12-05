@@ -5,7 +5,6 @@ import com.mayra.mercadinho.dao.ProdutoDAO;
 import com.mayra.mercadinho.service.CaixaService;
 import com.mayra.mercadinho.service.EstoqueService;
 import com.mayra.mercadinho.model.Produto;
-import com.mayra.mercadinho.model.Venda;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -69,67 +68,119 @@ public class TesteCaixa {
     private static void abrirCaixa(Scanner scanner) {
         System.out.print("Digite o saldo inicial para o caixa: ");
         double saldoInicial = scanner.nextDouble();
-        caixaService.abrirCaixa(saldoInicial);
+
+        // Substitua pelo ID do operador correto (ex.: operador logado no sistema)
+        int operadorId = 1; // Este é um valor de exemplo, ajuste conforme necessário.
+
+        // Cria uma instância de CaixaService para chamar o método de instância
+        CaixaService caixaService = new CaixaService();
+        caixaService.abrirCaixa(saldoInicial, operadorId); // Passe os dois parâmetros.
+
         System.out.println("Caixa aberto com saldo inicial de: R$" + saldoInicial);
     }
 
     // Registrar uma venda no caixa com opção de pagamento
-    private static void registrarVenda(Scanner scanner) throws SQLException {
-        System.out.print("Digite o ID do produto: ");
-        int produtoId = scanner.nextInt();
-        System.out.print("Digite a quantidade vendida: ");
-        int quantidadeVendida = scanner.nextInt();
+    public static void registrarVenda(Scanner scanner) throws SQLException {
+    System.out.print("Digite o ID do produto: ");
+    int produtoId = scanner.nextInt();
+    System.out.print("Digite a quantidade vendida: ");
+    int quantidadeVendida = scanner.nextInt();
 
-        // Verificar estoque antes de registrar a venda
-        int estoqueDisponivel = caixaService.verificarEstoque(produtoId);
+    // Verificar estoque antes de registrar a venda
+    int estoqueDisponivel = caixaService.verificarEstoque(produtoId);
 
-        if (estoqueDisponivel >= quantidadeVendida) {
-            // Registrar a venda
-            System.out.println("Escolha o meio de pagamento:");
+    if (estoqueDisponivel >= quantidadeVendida) {
+        // Buscar o preço do produto no banco de dados
+        Produto produto = produtoDAO.buscarProdutoPorId(produtoId);
+        double precoUnitario = produto.getPreco();
+
+        // Calcular o valor total da venda
+        double totalVenda = precoUnitario * quantidadeVendida;
+        System.out.println("Total da venda: R$ " + totalVenda);
+
+        // Primeiro pagamento
+        System.out.println("Escolha o  meio de pagamento:");
+        System.out.println("1. Dinheiro");
+        System.out.println("2. Cartão");
+        System.out.println("3. Pix");
+        System.out.print("Digite a opção do pagamento: ");
+        int opcaoPagamento1 = scanner.nextInt();
+
+        String metodoPagamento1 = "";
+        double valorPago1 = 0.0;
+
+        switch (opcaoPagamento1) {
+            case 1:
+                metodoPagamento1 = "Dinheiro";
+                System.out.print("Digite o valor pago pelo cliente: ");
+                valorPago1 = scanner.nextDouble();
+                break;
+            case 2:
+                metodoPagamento1 = "Cartão";
+                break;
+            case 3:
+                metodoPagamento1 = "Pix";
+                break;
+            default:
+                System.out.println("Opção inválida! Considerando pagamento em Dinheiro.");
+                metodoPagamento1 = "Dinheiro";
+                break;
+        }
+
+        // Segundo pagamento se necessário
+        double valorPago2 = 0.0;
+        String metodoPagamento2 = "";
+        double totalPago = valorPago1; // Inicializa com o primeiro pagamento
+
+        if (valorPago1 < totalVenda) {
+            System.out.println("Escolha o segundo meio de pagamento (caso queira dividir o pagamento):");
             System.out.println("1. Dinheiro");
             System.out.println("2. Cartão");
             System.out.println("3. Pix");
-            System.out.print("Digite a opção de pagamento: ");
-            int opcaoPagamento = scanner.nextInt();
+            System.out.print("Digite a opção do segundo pagamento: ");
+            int opcaoPagamento2 = scanner.nextInt();
 
-            String metodoPagamento = "";
-            double valorPago = 0.0;
-            double troco = 0.0;
-
-            switch (opcaoPagamento) {
+            switch (opcaoPagamento2) {
                 case 1:
-                    metodoPagamento = "Dinheiro";
-                    System.out.print("Digite o valor pago pelo cliente: ");
-                    valorPago = scanner.nextDouble();
-
-                    // Calcular o troco
-                    double totalVenda = caixaService.calcularTotalVenda(produtoId, quantidadeVendida);
-                    if (valorPago >= totalVenda) {
-                        troco = valorPago - totalVenda;
-                        System.out.println("Troco a ser devolvido: R$" + troco);
-                    } else {
-                        System.out.println("Valor insuficiente para o pagamento! Venda cancelada.");
-                        return; // Retorna sem registrar a venda
-                    }
+                    metodoPagamento2 = "Dinheiro";
+                    System.out.print("Digite o valor pago pelo cliente (segundo pagamento): ");
+                    valorPago2 = scanner.nextDouble();
                     break;
                 case 2:
-                    metodoPagamento = "Cartão";
+                    metodoPagamento2 = "Cartão";
                     break;
                 case 3:
-                    metodoPagamento = "Pix";
+                    metodoPagamento2 = "Pix";
                     break;
                 default:
                     System.out.println("Opção inválida! Considerando pagamento em Dinheiro.");
-                    metodoPagamento = "Dinheiro";
+                    metodoPagamento2 = "Dinheiro";
+                    break;
             }
 
-            // Registrar a venda e atualizar o estoque
-            caixaService.registrarVenda(produtoId, quantidadeVendida, metodoPagamento, troco);
-            System.out.println("Venda registrada com sucesso!");
-        } else {
-            System.out.println("Estoque insuficiente! Disponível: " + estoqueDisponivel);
+            totalPago += valorPago2; // Soma os dois pagamentos
         }
+
+        // Calcular o troco
+        double troco = totalPago - totalVenda;
+
+        // Verificar se o total pago cobre o valor total da venda
+        if (totalPago >= totalVenda) {
+            // Registrar a venda com os dois pagamentos
+            caixaService.registrarVenda(produtoId, quantidadeVendida, metodoPagamento1, metodoPagamento2, troco);
+            System.out.println("Venda registrada com sucesso!");
+            if (troco > 0) {
+                System.out.println("Troco a ser devolvido: R$ " + troco);
+            }
+        } else {
+            System.out.println("Valor total não coberto! Venda cancelada.");
+        }
+    } else {
+        System.out.println("Estoque insuficiente! Disponível: " + estoqueDisponivel);
     }
+}
+
+
 
     // Fechar o caixa
     private static void fecharCaixa() {
@@ -137,5 +188,3 @@ public class TesteCaixa {
         System.out.println("Caixa fechado com sucesso!");
     }
 }
-
-

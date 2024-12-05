@@ -5,15 +5,22 @@ public class ItemVenda {
     private int quantidade;
     private double precoUnitario;
 
-    // Construtor
+    // Construtor principal
     public ItemVenda(Produto produto, int quantidade, double precoUnitario) {
         this.produto = produto;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
     }
 
+    // Construtor adicional (caso precise de um objeto Produto por ID ou outra lógica)
     public ItemVenda(Object produtoById, int quantidadeVendida) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        // Aqui você pode implementar a lógica para inicializar o produto e a quantidade.
+        // Por exemplo, se o produtoById for um objeto Produto, você pode inicializar assim:
+        if (produtoById instanceof Produto) {
+            this.produto = (Produto) produtoById;
+            this.quantidade = quantidadeVendida;
+            this.precoUnitario = produto.getPreco(); // Supondo que o Produto tenha um método getPreco()
+        }
     }
 
     // Método para calcular o subtotal (quantidade * preço unitário)
