@@ -6,6 +6,7 @@ package com.mayra.mercadinho.view;
 
 import com.mayra.mercadinho.model.Produto;
 import com.mayra.mercadinho.dao.ProdutoDAO;
+import com.mayra.mercadinho.dao.EstoqueDAO;
 import javax.swing.JOptionPane;
 import java.sql.SQLException;
 
@@ -16,9 +17,18 @@ import java.sql.SQLException;
 public class CaixaView extends javax.swing.JFrame {
 
     // Declaração dos componentes gráficos
+      
     private javax.swing.JTextField txtNomeProduto;
+    private javax.swing.JTextField txtQuantidadeProduto;  // Declaração do campo de texto para quantidade
     private javax.swing.JLabel lblCodigoBarras;
     private javax.swing.JLabel lblPrecoProduto;
+    private javax.swing.JLabel lblTotalDoItem;
+    private javax.swing.JLabel lblSubtotal;
+
+    private double preco; // Para armazenar o preço do produto
+    private int quantidade; // Para armazenar a quantidade do produto
+    private double totalItem; // Para armazenar o valor total do item (preço * quantidade)
+    private double subtotal; // Para armazenar o subtotal da venda
     /**
      * Creates new form CaixaView
      */
@@ -67,13 +77,13 @@ public class CaixaView extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnRegistrarVenda = new javax.swing.JButton();
         jPanel14 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
+        lblTotalDoItem = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
-        jLabel16 = new javax.swing.JLabel();
+        lblSubtotal = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
@@ -82,7 +92,7 @@ public class CaixaView extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
         jPanel40 = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
-        jLabel13 = new javax.swing.JLabel();
+        txtQuantidadeProduto = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
@@ -412,13 +422,13 @@ public class CaixaView extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setBackground(new java.awt.Color(51, 153, 255));
-        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setText("REGISTRAR VENDA");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        btnRegistrarVenda.setBackground(new java.awt.Color(51, 153, 255));
+        btnRegistrarVenda.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnRegistrarVenda.setForeground(new java.awt.Color(255, 255, 255));
+        btnRegistrarVenda.setText("REGISTRAR VENDA");
+        btnRegistrarVenda.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                btnRegistrarVendaActionPerformed(evt);
             }
         });
 
@@ -428,10 +438,10 @@ public class CaixaView extends javax.swing.JFrame {
 
         jPanel15.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(51, 153, 255));
-        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel14.setText("R$ 8,98");
+        lblTotalDoItem.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTotalDoItem.setForeground(new java.awt.Color(51, 153, 255));
+        lblTotalDoItem.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblTotalDoItem.setText("R$ 8,98");
 
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
@@ -439,14 +449,14 @@ public class CaixaView extends javax.swing.JFrame {
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel15Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                .addComponent(lblTotalDoItem, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel15Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblTotalDoItem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -467,10 +477,10 @@ public class CaixaView extends javax.swing.JFrame {
 
         jPanel17.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel16.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel16.setForeground(new java.awt.Color(51, 153, 255));
-        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel16.setText("R$ 110,45");
+        lblSubtotal.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblSubtotal.setForeground(new java.awt.Color(51, 153, 255));
+        lblSubtotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblSubtotal.setText("R$ 110,45");
 
         javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
         jPanel17.setLayout(jPanel17Layout);
@@ -478,14 +488,14 @@ public class CaixaView extends javax.swing.JFrame {
             jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel17Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                .addComponent(lblSubtotal, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel17Layout.setVerticalGroup(
             jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel17Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblSubtotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -584,25 +594,27 @@ public class CaixaView extends javax.swing.JFrame {
 
         jPanel41.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(51, 153, 255));
-        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel13.setText("02");
+        txtQuantidadeProduto.setText("Digite a quantidade");
+        txtQuantidadeProduto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtQuantidadeProdutoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel41Layout = new javax.swing.GroupLayout(jPanel41);
         jPanel41.setLayout(jPanel41Layout);
         jPanel41Layout.setHorizontalGroup(
             jPanel41Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel41Layout.createSequentialGroup()
+            .addGroup(jPanel41Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(txtQuantidadeProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel41Layout.setVerticalGroup(
             jPanel41Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel41Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel41Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtQuantidadeProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -656,7 +668,7 @@ public class CaixaView extends javax.swing.JFrame {
                                                 .addComponent(jButton1)))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(btnRegistrarVenda, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
@@ -702,7 +714,7 @@ public class CaixaView extends javax.swing.JFrame {
                                 .addComponent(jPanel40, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnRegistrarVenda, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnBuscar))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -758,16 +770,86 @@ public class CaixaView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void btnRegistrarVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarVendaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
+    // Variáveis temporárias
+    String quantidadeText = txtQuantidadeProduto.getText(); // Obtém a quantidade do campo de texto
+
+        if (quantidadeText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, insira a quantidade do produto.");
+            return;
+        }
+
+        try {
+            quantidade = Integer.parseInt(quantidadeText);
+            if (quantidade <= 0) {
+                JOptionPane.showMessageDialog(this, "A quantidade deve ser maior que zero.");
+                return;
+            }
+
+            preco = Double.parseDouble(lblPrecoProduto.getText().replace("Preço: R$ ", "").replace(",", "."));
+            totalItem = preco * quantidade;
+            lblTotalDoItem.setText("Total do Item: R$ " + String.format("%.2f", totalItem));
+            subtotal += totalItem;
+            lblSubtotal.setText("Subtotal: R$ " + String.format("%.2f", subtotal));
+
+            // Verifica se a quantidade solicitada é menor ou igual ao estoque disponível
+            ProdutoDAO produtoDAO = new ProdutoDAO();
+            Produto produto = produtoDAO.localizar(txtNomeProduto.getText()); // Busca o produto pelo nome
+            EstoqueDAO estoqueDAO = new EstoqueDAO();
+            int quantidadeEstoque = estoqueDAO.obterQuantidadeProduto(produto.getCodigoBarras());
+
+            if (quantidade > quantidadeEstoque) {
+                JOptionPane.showMessageDialog(this, "Quantidade solicitada excede o estoque disponível.");
+                return;
+            }
+
+            // Atualiza o estoque (se necessário)
+            estoqueDAO.atualizarQuantidadeProduto(produto.getCodigoBarras(), quantidadeEstoque - quantidade);
+
+            // Registrar a venda (ajuste conforme seu DAO)
+            CaixaDAO caixaDAO = new CaixaDAO();
+            caixaDAO.registrarVenda(produto, quantidade, totalItem); // Usando o CaixaDAO para registrar a venda
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Por favor, insira um valor válido para a quantidade.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao acessar o banco de dados: " + e.getMessage());
+        }
+    }
+
+      private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {
+        String entrada = txtNomeProduto.getText();
+
+        if (entrada.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, insira o nome ou código de barras do produto.");
+            return;
+        }
+
+        ProdutoDAO produtoDAO = new ProdutoDAO();
+        Produto produto;
+        try {
+            produto = produtoDAO.localizar(entrada); // Usa o método do DAO para buscar o produto
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao acessar o banco de dados: " + e.getMessage());
+            return;
+        }
+
+        if (produto != null) {
+            // Exibe os dados nos componentes
+            txtNomeProduto.setText(produto.getNome());
+            lblCodigoBarras.setText("Código de Barras: " + produto.getCodigoBarras());
+            lblPrecoProduto.setText("Preço: R$ " + produto.getPreco());
+        } else {
+            JOptionPane.showMessageDialog(this, "Produto não encontrado.");
+        }
+    
+    }//GEN-LAST:event_btnRegistrarVendaActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 // TODO add your handling code here:
 
-   
-    
-    String entrada = txtNomeProduto.getText(); // Obtém o texto do campo
+   String entrada = txtNomeProduto.getText();
 
     if (entrada.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Por favor, insira o nome ou código de barras do produto.");
@@ -777,28 +859,30 @@ public class CaixaView extends javax.swing.JFrame {
     ProdutoDAO produtoDAO = new ProdutoDAO();
     Produto produto;
     try {
-        produto = produtoDAO.localizar(entrada); // Usa o método `localizar`
+        produto = produtoDAO.localizar(entrada); // Usa o método do DAO
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(this, "Erro ao acessar o banco de dados: " + e.getMessage());
         return;
     }
 
     if (produto != null) {
+        // Exibe os dados nos componentes
+        txtNomeProduto.setText(produto.getNome()); // Exibe o nome no campo
         lblCodigoBarras.setText("Código de Barras: " + produto.getCodigoBarras());
         lblPrecoProduto.setText("Preço: R$ " + produto.getPreco());
     } else {
         JOptionPane.showMessageDialog(this, "Produto não encontrado.");
-}
-}
-
-
-
+    }
         
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void txtNomeProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeProdutoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNomeProdutoActionPerformed
+
+    private void txtQuantidadeProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtQuantidadeProdutoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtQuantidadeProdutoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -837,16 +921,13 @@ public class CaixaView extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnRegistrarVenda;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -884,6 +965,9 @@ public class CaixaView extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblCodigoBarras;
     private javax.swing.JLabel lblPrecoProduto;
+    private javax.swing.JLabel lblSubtotal;
+    private javax.swing.JLabel lblTotalDoItem;
     private javax.swing.JTextField txtNomeProduto;
+    private javax.swing.JTextField txtQuantidadeProduto;
     // End of variables declaration//GEN-END:variables
 }
