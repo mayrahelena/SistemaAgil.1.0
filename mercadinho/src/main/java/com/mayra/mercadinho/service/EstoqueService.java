@@ -10,8 +10,16 @@ import java.sql.SQLException;
 
 public class EstoqueService {
 
-    public EstoqueService(ProdutoDAO ProdutoDAO) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private ProdutoDAO produtoDAO;
+
+    // Construtor que recebe um ProdutoDAO para realizar operações relacionadas ao estoque
+    public EstoqueService(ProdutoDAO produtoDAO) {
+        this.produtoDAO = produtoDAO;
+    }
+
+    // Método que verifica o estoque de um produto
+    public int verificarEstoque(int produtoId) {
+        return produtoDAO.obterEstoqueProduto(produtoId);  // Supondo que ProdutoDAO tenha esse método
     }
 
     // Método que atualiza o estoque após uma venda

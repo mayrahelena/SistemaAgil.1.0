@@ -1,32 +1,37 @@
 package com.mercadinho;
 
 import com.mayra.mercadinho.dao.CaixaDAO;
-import com.mayra.mercadinho.service.CaixaService;
 import com.mayra.mercadinho.dao.ProdutoDAO;
+import com.mayra.mercadinho.service.CaixaService;
 import com.mayra.mercadinho.service.EstoqueService;
+import com.mayra.mercadinho.model.Produto;
 import com.mayra.mercadinho.model.Venda;
+
 import java.sql.*;
 import java.util.Scanner;
 
 public class TesteCaixa {
+
     private static Connection connection;
-    private static CaixaService CaixaService;
-    private static CaixaDAO CaixaDAO;
-    private static ProdutoDAO ProdutoDAO;
-    private static EstoqueService EstoqueService;
-    
+    private static CaixaService caixaService;
+    private static CaixaDAO caixaDAO;
+    private static ProdutoDAO produtoDAO;
+    private static EstoqueService estoqueService;
+
     public static void main(String[] args) {
         try {
-            // Configuração da conexão com o banco de dados
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "senha");
-            CaixaDAO = new CaixaDAO(connection);
-            ProdutoDAO = new ProdutoDAO(connection);
-            EstoqueService = new EstoqueService(ProdutoDAO);
-            CaixaService = new CaixaService(CaixaDAO, ProdutoDAO, EstoqueService);
+            // Estabelecendo a conexão com o banco de dados
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "Senac@2024");
+
+            // Inicializando as classes DAO e Service
+            caixaDAO = new CaixaDAO(connection);
+            produtoDAO = new ProdutoDAO(connection);
+            estoqueService = new EstoqueService(produtoDAO);
+            caixaService = new CaixaService(caixaDAO, produtoDAO, estoqueService);
 
             Scanner scanner = new Scanner(System.in);
             int opcao;
-            
+
             do {
                 System.out.println("\n===== MENU CAIXA =====");
                 System.out.println("1. Abrir caixa");
@@ -54,7 +59,7 @@ public class TesteCaixa {
                 }
             } while (opcao != 4);
 
-            connection.close();
+            connection.close(); // Fechando a conexão ao final
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -64,20 +69,20 @@ public class TesteCaixa {
     private static void abrirCaixa(Scanner scanner) {
         System.out.print("Digite o saldo inicial para o caixa: ");
         double saldoInicial = scanner.nextDouble();
-        CaixaService.abrirCaixa(saldoInicial);
+        caixaService.abrirCaixa(saldoInicial);
         System.out.println("Caixa aberto com saldo inicial de: R$" + saldoInicial);
     }
 
     // Registrar uma venda no caixa com opção de pagamento
-    private static void registrarVenda(Scanner scanner) {
+    private static void registrarVenda(Scanner scanner) throws SQLException {
         System.out.print("Digite o ID do produto: ");
         int produtoId = scanner.nextInt();
         System.out.print("Digite a quantidade vendida: ");
         int quantidadeVendida = scanner.nextInt();
-        
+
         // Verificar estoque antes de registrar a venda
-        int estoqueDisponivel = CaixaService.verificarEstoque(produtoId);
-        
+        int estoqueDisponivel = caixaService.verificarEstoque(produtoId);
+
         if (estoqueDisponivel >= quantidadeVendida) {
             // Registrar a venda
             System.out.println("Escolha o meio de pagamento:");
@@ -86,19 +91,19 @@ public class TesteCaixa {
             System.out.println("3. Pix");
             System.out.print("Digite a opção de pagamento: ");
             int opcaoPagamento = scanner.nextInt();
-            
+
             String metodoPagamento = "";
             double valorPago = 0.0;
             double troco = 0.0;
-            
+
             switch (opcaoPagamento) {
                 case 1:
                     metodoPagamento = "Dinheiro";
                     System.out.print("Digite o valor pago pelo cliente: ");
                     valorPago = scanner.nextDouble();
-                    
+
                     // Calcular o troco
-                    double totalVenda = CaixaService.calcularTotalVenda(produtoId, quantidadeVendida);
+                    double totalVenda = caixaService.calcularTotalVenda(produtoId, quantidadeVendida);
                     if (valorPago >= totalVenda) {
                         troco = valorPago - totalVenda;
                         System.out.println("Troco a ser devolvido: R$" + troco);
@@ -119,7 +124,7 @@ public class TesteCaixa {
             }
 
             // Registrar a venda e atualizar o estoque
-            CaixaService.registrarVenda(produtoId, quantidadeVendida, metodoPagamento, troco);
+            caixaService.registrarVenda(produtoId, quantidadeVendida, metodoPagamento, troco);
             System.out.println("Venda registrada com sucesso!");
         } else {
             System.out.println("Estoque insuficiente! Disponível: " + estoqueDisponivel);
@@ -128,7 +133,7 @@ public class TesteCaixa {
 
     // Fechar o caixa
     private static void fecharCaixa() {
-        CaixaService.fecharCaixa();
+        caixaService.fecharCaixa();
         System.out.println("Caixa fechado com sucesso!");
     }
 }
