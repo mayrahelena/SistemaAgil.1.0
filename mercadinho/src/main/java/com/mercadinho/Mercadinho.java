@@ -17,7 +17,7 @@ public class Mercadinho {
 
         while (true) {
             System.out.println("Escolha uma opção:");
-            System.out.println("1 - Adicionar um novo produto");
+            System.out.println("1 - Adicionar um novo produto ou atualizar produto existente");
             System.out.println("2 - Listar produtos");
             System.out.println("3 - Excluir produto");
             System.out.println("4 - Editar produto");
@@ -27,38 +27,79 @@ public class Mercadinho {
             int opcao = scanner.nextInt();
             scanner.nextLine(); // Consumir a quebra de linha
 
-            switch (opcao) {
+                switch (opcao) {
+            
                 case 1 -> {
-                    // Variáveis locais que são usadas apenas dentro deste caso
+                    // Caso de adicionar ou atualizar produto
                     System.out.println("Digite o nome do produto:");
                     String nome = scanner.nextLine();
-                    System.out.println("Digite o preço do produto:");
-                    double preco = 0;
-                    while (true) {
-                        try {
-                            preco = Double.parseDouble(scanner.nextLine().replace(",", ".")); // Garantir que o preço seja numérico
-                            break;
-                        } catch (NumberFormatException e) {
-                            System.out.println("Por favor, insira um valor numérico válido para o preço.");
-                        }
-                    }
                     System.out.println("Digite o código de barras do produto:");
                     String codigoBarras = scanner.nextLine();
 
-                    System.out.println("Digite a quantidade inicial do produto:");
-                    quantidade = scanner.nextInt();
-                    System.out.println("Digite o estoque mínimo do produto:");
-                    estoqueMinimo = scanner.nextInt();
-                    scanner.nextLine(); // Consumir a quebra de linha
+                    // Verificação do produto existente no banco
+                  Produto produto = null;
+        try {
+            // Agora, usando o método localizarProduto para verificar se o produto já existe
+            produto = produtoController.localizarProduto(codigoBarras);
+        } catch (SQLException e) {
+            System.err.println("Erro ao localizar produto: " + e.getMessage());
+        }
+                    Produto localizarProduto = null;
 
-                    novoProduto = new Produto(0, nome, preco, codigoBarras); // Instanciando o produto
-                    try {
-                        produtoController.adicionarProduto(novoProduto, quantidade, estoqueMinimo);
-                        System.out.println("Produto adicionado com sucesso!");
-                    } catch (SQLException e) {
-                        System.err.println("Erro ao adicionar produto: " + e.getMessage());
+                    // Se o produto já existir, pedimos a quantidade e o estoque mínimo para atualização
+                    if (localizarProduto != null) {
+                        System.out.println("Produto encontrado: " + localizarProduto.getNome() + " - Código de Barras: " + localizarProduto.getCodigoBarras());
+                        System.out.println("Deseja atualizar a quantidade e o estoque mínimo? (S/N)");
+
+                        String resposta = scanner.nextLine().toUpperCase();
+                        if (resposta.equals("S")) {
+                            System.out.println("Digite a quantidade a ser adicionada ao estoque:");
+                            quantidade = scanner.nextInt();
+                            System.out.println("Digite o novo estoque mínimo:");
+                            estoqueMinimo = scanner.nextInt();
+                            scanner.nextLine(); // Consumir a quebra de linha
+
+                            // Atualiza o estoque e o estoque mínimo
+                            try {
+                                produtoController.adicionarProduto(localizarProduto, quantidade, estoqueMinimo);
+                                System.out.println("Produto atualizado com sucesso!");
+                            } catch (SQLException e) {
+                                System.err.println("Erro ao atualizar produto: " + e.getMessage());
+                            }
+                        }
+                    } else {
+                        // Se o produto não existir, vamos cadastrar um novo
+                        System.out.println("Produto não encontrado. Vamos cadastrar um novo produto.");
+
+                        System.out.println("Digite o preço do produto:");
+                        double preco = 0;
+                        while (true) {
+                            try {
+                                preco = Double.parseDouble(scanner.nextLine().replace(",", ".")); // Garantir que o preço seja numérico
+                                break;
+                            } catch (NumberFormatException e) {
+                                System.out.println("Por favor, insira um valor numérico válido para o preço.");
+                            }
+                        }
+
+                        // Pedir quantidade inicial e estoque mínimo para o novo produto
+                        System.out.println("Digite a quantidade inicial do produto:");
+                        quantidade = scanner.nextInt();
+                        System.out.println("Digite o estoque mínimo do produto:");
+                        estoqueMinimo = scanner.nextInt();
+                        scanner.nextLine(); // Consumir a quebra de linha
+
+                        // Criação do novo produto
+                        novoProduto = new Produto(0, nome, preco, codigoBarras); // Produto novo sem ID
+                        try {
+                            produtoController.adicionarProduto(novoProduto, quantidade, estoqueMinimo);
+                            System.out.println("Produto adicionado com sucesso!");
+                        } catch (SQLException e) {
+                            System.err.println("Erro ao adicionar produto: " + e.getMessage());
+                        }
                     }
                 }
+
 
                 case 2 -> {
                     // Variáveis locais para o caso de listar produtos

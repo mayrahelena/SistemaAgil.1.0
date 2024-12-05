@@ -8,6 +8,25 @@ import java.util.List;
 
 public class EstoqueDAO {
 
+    private Connection connection;  // A conexão com o banco de dados será mantida aqui
+
+    // Construtor para conectar ao banco de dados
+    public EstoqueDAO() {
+        conectar();  // Ao instanciar a classe, chamamos o método para estabelecer a conexão com o banco
+    }
+
+    // Método para conectar ao banco de dados
+    private void conectar() {
+        try {
+            // Usando a classe DatabaseConnection para obter a conexão
+            this.connection = DatabaseConnection.getConnection();
+            System.out.println("Conexão estabelecida com o banco de dados.");
+        } catch (SQLException e) {
+            // Se a conexão falhar, captura a exceção e imprime a mensagem
+            System.err.println("Erro ao conectar ao banco de dados: " + e.getMessage());
+        }
+    }
+
     // Método para listar o estoque
     public List<Estoque> listarEstoque() throws SQLException {
         List<Estoque> estoques = new ArrayList<>();
@@ -35,16 +54,19 @@ public class EstoqueDAO {
         return estoques;
     }
     
-    // Método para adicionar estoque
-    public void adicionarEstoque(int produtoId, int quantidade, int estoqueMinimo) throws SQLException {
-        String sql = "INSERT INTO estoque (produto_id, quantidade, estoque_minimo) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, produtoId);  // Relacionando com o produto
-            stmt.setInt(2, quantidade);  // Definindo a quantidade
-            stmt.setInt(3, estoqueMinimo);  // Definindo o estoque mínimo
-            stmt.executeUpdate();  // Executa a inserção
-        }
+   public void atualizarEstoque(int produtoId, int quantidade, int estoqueMinimo) throws SQLException {
+    if (connection == null) {
+        throw new SQLException("Conexão não estabelecida com o banco.");
     }
+
+    // Atualizar o estoque do produto
+    String sqlAtualizarEstoque = "UPDATE estoque SET quantidade = ?, estoque_minimo = ? WHERE produto_id = ?";
+    try (PreparedStatement stmt = connection.prepareStatement(sqlAtualizarEstoque)) {
+        stmt.setInt(1, quantidade);  // Define a nova quantidade
+        stmt.setInt(2, estoqueMinimo);  // Define o novo estoque mínimo
+        stmt.setInt(3, produtoId);  // Relaciona com o ID do produto
+        stmt.executeUpdate();  // Executa a atualização
+    }
+}
     
 }  
