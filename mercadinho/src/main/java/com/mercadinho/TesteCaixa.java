@@ -5,7 +5,8 @@ import com.mayra.mercadinho.dao.ProdutoDAO;
 import com.mayra.mercadinho.service.CaixaService;
 import com.mayra.mercadinho.service.EstoqueService;
 import com.mayra.mercadinho.model.Produto;
-
+import javax.swing.SwingUtilities;
+import com.mayra.mercadinho.view.CaixaView;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -18,9 +19,14 @@ public class TesteCaixa {
     private static EstoqueService estoqueService;
 
     public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            CaixaView caixaView = new CaixaView();
+            caixaView.setVisible(true);
+        });
+        
         try {
             // Estabelecendo a conexão com o banco de dados
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "Senac@2024");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "021998@Amor");
 
             // Inicializando as classes DAO e Service
             caixaDAO = new CaixaDAO(connection);

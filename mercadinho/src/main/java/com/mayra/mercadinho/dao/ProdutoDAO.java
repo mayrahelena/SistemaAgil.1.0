@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class ProdutoDAO {
 
     private Connection connection;
@@ -23,7 +24,7 @@ public class ProdutoDAO {
     // Método para conectar ao banco de dados
     private void conectar() {
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "Senac@2024");
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mercadinho_db", "root", "021998@Amor");
             if (this.connection != null) {
                 System.out.println("Conexão estabelecida com o banco de dados.");
             } else {
@@ -192,6 +193,8 @@ public class ProdutoDAO {
         if (connection == null) {
             throw new SQLException("Conexão não estabelecida com o banco.");
         }
+        
+
 
         String sql = "SELECT * FROM produto WHERE codigo_barras = ? OR nome = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
